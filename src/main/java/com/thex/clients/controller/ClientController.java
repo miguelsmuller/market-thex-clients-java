@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+
 
 import com.thex.clients.repository.ClientRepository;
 
@@ -64,7 +66,12 @@ public class ClientController {
     }
 
     @DeleteMapping("/clients/{id}")
-    void deleteClient(@PathVariable Long id) {
-        clientRepository.deleteById(id);
+    ResponseEntity<?> deleteClient(@PathVariable Long id) {
+        if (clientRepository.existsById(id)) {
+            clientRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found");
+        }
     }
 }
